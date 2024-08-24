@@ -43,7 +43,7 @@ const getId = (reference) => {
     },
   };
 
-  axios
+  await axios
     .request(config)
     .then((response) => {
       // console.log(JSON.stringify(response.data));
@@ -115,15 +115,43 @@ const getId = (reference) => {
 
     await axios
       .request(config)
-      .then((response) => {
+      .then(async (response) => {
         // console.log(JSON.stringify(response.data));
-        for (const car of response.data.hits) {
+        for await (const car of response.data.hits) {
           const reference = car.item.reference;
 
           const url = `https://www.lacentrale.fr/auto-occasion-annonce-${getId(
             reference
           )}.html`;
           console.log(url);
+          let config = {
+            method: "get",
+            maxBodyLength: Infinity,
+            url: `https://www.lacentrale.fr/app-classified?id=${getId(
+            reference)}&vertical=auto`,
+            headers: {
+              Host: "www.lacentrale.fr",
+              Pragma: "no-cache",
+              "Cache-Control": "no-cache",
+              "Upgrade-Insecure-Requests": "1",
+              "User-Agent":
+                "Mozilla/5.0 (Linux; Android 10; Redmi Note 8 Build/QQ3A.200805.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/74.0.3729.186 Mobile Safari/537.36 #Android;android10;11.0.0",
+              Accept:
+                "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,/;q=0.8,application/signed-exchange;v=b3",
+              "Accept-Encoding": "gzip, deflate",
+              "Accept-Language": "en-US,en;q=0.9",
+              "X-Requested-With": "fr.carboatmedia.lacentrale",
+            },
+          };
+
+          await axios
+            .request(config)
+            .then((response) => {
+              console.log(JSON.stringify(response.data));
+            })
+            .catch((error) => {
+              console.log(error);
+            });
         }
 
         total = response.data.total;
